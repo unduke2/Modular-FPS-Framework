@@ -4,13 +4,21 @@ using UnityEngine;
 public class ReloadComponent : BaseComponent<ReloadConfig>
 {
     private int _totalAmmo;
+
+    private AnimationComponent _animationComponent;
     public override void Initialize(ReloadConfig config, Weapon weapon)
     {
         base.Initialize(config, weapon);
+
         _totalAmmo = _config.TotalAmmo;
         _weapon.State.CurrentAmmo = _config.MagazineSize;
         _weapon.State.IsReloading = false;
         
+    }
+
+    private void Start()
+    {
+        _animationComponent = _weapon.GetWeaponComponent<AnimationComponent>();
     }
     public void HandleReload()
     {
@@ -21,10 +29,14 @@ public class ReloadComponent : BaseComponent<ReloadConfig>
         return;
     }
 
-
-        WeaponEvents.Reload();
-        Debug.Log("Reloading Started!");
-        _weapon.State.IsReloading = true;
+        if (_animationComponent != null)
+        {
+            _animationComponent.PlayReloadAnimation();
+        }
+        else
+        {
+            Debug.LogError($"{nameof(ReloadComponent)}: No AnimationComponent found on this weapon");
+        }
     }
 
     public void CompleteReload()
@@ -45,7 +57,7 @@ public class ReloadComponent : BaseComponent<ReloadConfig>
             _weapon.State.CurrentAmmo += _totalAmmo;
             _totalAmmo = 0;
         }
-        Debug.Log($"Weapon has been reloaded! Current Ammo: {_weapon.State.CurrentAmmo} Total Ammo: {_totalAmmo}");
+        Debug.Log($"Weapon reloaded! Current Ammo: {_weapon.State.CurrentAmmo} Total Ammo: {_totalAmmo}");
     }
 
 }
