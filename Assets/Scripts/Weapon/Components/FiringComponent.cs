@@ -1,45 +1,48 @@
 using System.Collections;
-using System.Linq;
 using UnityEngine;
 
 public class FireComponent : BaseComponent<FireConfig>
 {
 
-    private float _nextFireTime = 0f;
-    private FireMode _currentFireMode;
+    private float _nextFireTime;
     private bool _canFire = true;
-    private Coroutine _burstFireCoroutine = null;
-    //private LayerMask _layerMask = LayerMask.GetMask("Level", "Enemy");
-
-    private Transform weaponTransform;
+    private Coroutine _burstFireCoroutine;
 
 
+    private FireMode _currentFireMode;
+    private SpreadComponent _spreadComponent;
+    private RecoilComponent _recoilComponent;
 
     public override void Initialize(FireConfig config, Weapon weapon)
     {
         base.Initialize(config, weapon);
+
         if (_config.FireModes == null || _config.FireModes.Length == 0)
         {
             Debug.LogError("FireConfig: FireModes array is empty. Weapon cannot fire!");
-            _currentFireMode = FireMode.None; // Default to a safe "None" mode if no valid fire modes are provided.
+            _currentFireMode = FireMode.None;
             return;
         }
-        //_currentFireMode = _config.FireModes.FirstOrDefault();
+
         _currentFireMode = _config.DefaultFireMode;
         Debug.Log($"FireComponent: Initialized with FireMode {_currentFireMode} and FireRate {_config.FireRate}.");
-
     }
+
+    private void Start()
+    {
+        _spreadComponent = _weapon.GetWeaponComponent<SpreadComponent>();
+        _recoilComponent = _weapon.GetWeaponComponent<RecoilComponent>();
+    }
+
     public void HandleFire()
     {
         if (_canFire)
         {
-
-
             _canFire = false;
 
             if (_currentFireMode == FireMode.None)
             {
-                Debug.LogWarning("FireComponent: Attempted to fire with no valid fire mode.");
+                Debug.LogWarning($"{nameof(FireComponent)}: Attempted to fire with no valid fire mode.");
                 return;
             }
 
@@ -54,13 +57,12 @@ public class FireComponent : BaseComponent<FireConfig>
             }
         }
 
-
-
         if (_currentFireMode == FireMode.Auto)
         {
             FireAuto();
         }
     }
+
 
     public void HandleFireReleased()
     {
@@ -68,11 +70,10 @@ public class FireComponent : BaseComponent<FireConfig>
     }
 
 
-
     public void FireSingle()
     {
 
-        if (InCooldown())
+        if (!CanShootAgain())
         {
             return;
         }
@@ -83,12 +84,14 @@ public class FireComponent : BaseComponent<FireConfig>
 
     }
 
+
     public void FireBurst()
     {
-        if (InCooldown())
+        if (!CanShootAgain())
         {
             return;
         }
+
         if (_burstFireCoroutine != null)
         {
             StopCoroutine(_burstFireCoroutine);
@@ -97,9 +100,10 @@ public class FireComponent : BaseComponent<FireConfig>
         _burstFireCoroutine = StartCoroutine(BurstFireRoutine());
     }
 
+
     public void FireAuto()
     {
-        if (InCooldown())
+        if (!CanShootAgain())
         {
             return;
         }
@@ -111,112 +115,93 @@ public class FireComponent : BaseComponent<FireConfig>
 
     private IEnumerator BurstFireRoutine()
     {
-        for (int i = _config.BurstCount; i > 0; i--)
-        {
-            if (_weapon.State.CurrentAmmo < 0)
-            {
+        int shotsRemaining = _config.BurstCount;
 
-                break;
-            }
+        while (shotsRemaining > 0)
+        {
+            if (_weapon.State.CurrentAmmo <= 0) break;
 
             FireBullet();
+            shotsRemaining--;
 
             yield return new WaitForSeconds(1f / _config.FireRate);
-
         }
-        _burstFireCoroutine = null;
+
         _nextFireTime = Time.time + (1f / _config.FireRate);
+        _burstFireCoroutine = null;
     }
 
-    private void Update()
-    {
-        //Debug.DrawRay(_weapon.State.MuzzleTransform.position, _weapon.State.MuzzleTransform.forward);
-    }
+
     private void FireBullet()
     {
         if (_weapon.State.IsReloading)
         {
-            return ;
+            return;
         }
-        if (_weapon.State.CurrentAmmo > 0)
+
+        if (_weapon.State.CurrentAmmo <= 0)
         {
+            Debug.Log("No ammo left!");
+        }
 
 
-            Vector3 bulletDir = _weapon.State.MuzzleTransform.forward;
-            var spreadComponent = _weapon.GetWeaponComponent<SpreadComponent>();
 
-            if (spreadComponent != null)
+        Vector3 muzzleForward = _weapon.State.MuzzleTransform.forward;
+        Vector3 bulletDir = muzzleForward;
+
+        if (_spreadComponent != null)
+        {
+            bulletDir = _spreadComponent.CalculateSpread(bulletDir, transform.right, transform.up);
+        }
+
+        if (_recoilComponent != null)
+        {
+            _recoilComponent.ApplyRecoil();
+        }
+
+        if (Physics.Raycast(_weapon.State.MuzzleTransform.position, bulletDir, out RaycastHit hit, _config.HitRange))
+        {
+            Debug.Log($"Hit {LayerMask.LayerToName(hit.collider.gameObject.layer)}");
+
+            if (_config.BulletHolePrefab != null)
             {
+                Quaternion decalRotation = Quaternion.LookRotation(-hit.normal);
 
-                bulletDir = spreadComponent.CalculateSpread(bulletDir, transform.right, transform.up);
+                Vector3 decalPosition = hit.point + hit.normal * _config.BulletHoleOffset;
 
+                GameObject bulletHole = Instantiate(_config.BulletHolePrefab, decalPosition, decalRotation);
+
+                Destroy(bulletHole, 10f);
             }
+        }
+        else
+        {
+            Debug.Log("No hit");
+        }
 
-            var recoilComponent = _weapon.GetWeaponComponent<RecoilComponent>();
+        GameObject flash = Instantiate(
+          _config.MuzzleFlashPrefab,
+          _weapon.State.MuzzleTransform.position,
+          _weapon.State.MuzzleTransform.rotation);
 
-            if (recoilComponent != null)
-            {
-                //Debug.Log("applied recoil");
-                recoilComponent.ApplyRecoil();
-            }
+        flash.transform.parent = _weapon.State.MuzzleTransform;
 
-            Debug.Log("Final bullet direction: " + bulletDir);
-            RaycastHit hit;
+        Destroy(flash, 0.5f);
 
-            if (Physics.Raycast(_weapon.State.MuzzleTransform.position, bulletDir, out hit, _config.HitRange))
-            {
-                string layer = LayerMask.LayerToName(hit.collider.gameObject.layer);
-                Debug.Log("Hit " + layer);
-                if (_config.BulletHolePrefab != null)
-                {
-                    // Create a rotation that aligns the decal with the surface normal.
-                    Quaternion decalRotation = Quaternion.LookRotation(-hit.normal);
-                    // Slightly offset the decal along the normal to prevent z-fighting.
-                    Vector3 decalPosition = hit.point + hit.normal * _config.BulletHoleOffset;
-                    Debug.Log("Instantiating bullet hole at: " + decalPosition);
-
-                    GameObject bulletHole = Instantiate(_config.BulletHolePrefab, decalPosition, decalRotation);
-
-                    //// Optionally, parent the decal to the hit object so it moves if the object moves.
-                    //bulletHole.transform.parent = hit.collider.transform;
-
-                    // Optionally destroy the bullet hole after some time to avoid clutter.
-                    Destroy(bulletHole, 10f);
-                }
-            }
-            else
-            {
-                Debug.Log("Did not hit");
-            }
+        AudioSource gunshotAudioSource = _config.GunshotAudioSource;
+        if (gunshotAudioSource != null && gunshotAudioSource.clip != null)
+        {
+            gunshotAudioSource.PlayOneShot(gunshotAudioSource.clip);
+        }
 
 
-            ////GameObject bullet = Instantiate(bullet, weaponTransform.position, Quaternion.LookRotation(bulletDirection, weaponTransform.up));
-            GameObject flash = Instantiate(
-              _config.MuzzleFlashPrefab,
-              _weapon.State.MuzzleTransform.position,
-              _weapon.State.MuzzleTransform.rotation);
-            flash.transform.parent = _weapon.State.MuzzleTransform;
-            Destroy(flash, 0.5f);
-
-            var audioSource = _weapon.State.AudioSource;
-            if (audioSource != null)
-            {
-                audioSource.PlayOneShot(audioSource.clip);
-            }
-
-
-          _weapon.State.CurrentAmmo--;
-            Debug.Log("Fired a bullet! Current ammo count: " + _weapon.State.CurrentAmmo);
-        } 
-
+        _weapon.State.CurrentAmmo--;
+        Debug.Log("Fired a bullet! Current ammo: " + _weapon.State.CurrentAmmo);
     }
 
 
-
-    private bool InCooldown()
+    private bool CanShootAgain()
     {
-        return Time.time < _nextFireTime ? true : false;
+        return Time.time >= _nextFireTime;
     }
-
-
 }
