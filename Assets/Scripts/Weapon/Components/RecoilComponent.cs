@@ -12,6 +12,7 @@ public class RecoilComponent : BaseComponent<RecoilConfig>
       
     }
 
+
     private void Start()
     {
         _cameraController = _weapon.State.HolderCamera;
@@ -22,10 +23,12 @@ public class RecoilComponent : BaseComponent<RecoilConfig>
         }
     }
 
+
     private void Update()
     {
         RecoverRecoil();
     }
+
 
     public void ApplyRecoil()
     {
@@ -40,6 +43,7 @@ public class RecoilComponent : BaseComponent<RecoilConfig>
             Debug.Log("Camera controller is null - cannot apply recoil offset.");
         }
     }
+
 
     public void RecoverRecoil()
     {
