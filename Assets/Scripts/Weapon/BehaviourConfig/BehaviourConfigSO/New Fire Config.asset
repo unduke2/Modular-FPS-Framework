@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 315c21452847e01409b64dd8692204b6, type: 3}
+  m_Name: New Fire Config
+  m_EditorClassIdentifier: 
+  FireModes: 010000000200000003000000
+  FireRate: 10
+  DefaultFireMode: 1
+  BurstCount: 3
+  HitRange: 200
+  MuzzleFlashPrefab: {fileID: 5377767129496358887, guid: 8d151d690a5fbec44a988e4cf4d9427c, type: 3}
+  BulletHolePrefab: {fileID: 114900699382448101, guid: 5e656316de5d990478339fa75a9c1aa6, type: 3}
+  BulletHoleOffset: 0.01

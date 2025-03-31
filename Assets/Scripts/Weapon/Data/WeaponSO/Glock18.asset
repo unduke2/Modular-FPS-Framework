@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a57a4f9201c02049917096d6fd1a30a, type: 3}
+  m_Name: Glock18
+  m_EditorClassIdentifier: 
+  WeaponName: Glock 18
+  WeaponPrefab: {fileID: 4845898491946154288, guid: d4539e1eb68c4264cb09a474775e1d8d, type: 3}
+  BehaviourConfigs:
+  - {fileID: 11400000, guid: d6a9cf32d6c38eb4498655a46ea52207, type: 2}
+  - {fileID: 11400000, guid: 75d1973ca87415b458d6c0ba18a64e07, type: 2}
+  - {fileID: 11400000, guid: c3874dfb481767d4fada706f1fdddb76, type: 2}
+  - {fileID: 11400000, guid: f5da1c917a9653741af1e3b8b3f1f1bf, type: 2}
+  - {fileID: 11400000, guid: cdc1132357af03349a01d6ff3d4c85e1, type: 2}
+  - {fileID: 11400000, guid: 628323625b4674b40a8b24ba1b0e2907, type: 2}
+  - {fileID: 11400000, guid: 6ad48f7b7e13a724088b6dea47b3cef7, type: 2}
+  - {fileID: 11400000, guid: 350b58847a5d0204eb30ab82b0942c3e, type: 2}

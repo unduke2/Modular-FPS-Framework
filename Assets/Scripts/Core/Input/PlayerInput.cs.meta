@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 5d4e7da53c4702c4d9bdb0cae496670a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _movementActionRef: {fileID: -766808597404061085, guid: c16d27cec3910de4aacedaa32c175b5e, type: 3}
+  - _jumpActionRef: {fileID: 6088532067966391073, guid: c16d27cec3910de4aacedaa32c175b5e, type: 3}
+  - _sprintActionRef: {fileID: 8825050844895616704, guid: c16d27cec3910de4aacedaa32c175b5e, type: 3}
+  - _crouchActionRef: {fileID: -109940211784481998, guid: c16d27cec3910de4aacedaa32c175b5e, type: 3}
+  - _mousePosActionRef: {fileID: -8025717237947550167, guid: c16d27cec3910de4aacedaa32c175b5e, type: 3}
+  - _fireActionRef: {fileID: -764770659786920631, guid: c16d27cec3910de4aacedaa32c175b5e, type: 3}
+  - _reloadActionRef: {fileID: -3415756099904730208, guid: c16d27cec3910de4aacedaa32c175b5e, type: 3}
+  - _freeLookActionRef: {fileID: 7346783895853676296, guid: c16d27cec3910de4aacedaa32c175b5e, type: 3}
+  - _aimActionRef: {fileID: 5210187162070218477, guid: c16d27cec3910de4aacedaa32c175b5e, type: 3}
+  - _flashLightActionRef: {fileID: -4409622403418209196, guid: c16d27cec3910de4aacedaa32c175b5e, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
