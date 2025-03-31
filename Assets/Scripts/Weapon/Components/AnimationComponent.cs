@@ -1,61 +1,53 @@
-using System.Collections;
-using System.Runtime.CompilerServices;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Animations.Rigging;
 
 public class AnimationComponent : BaseComponent<AnimationConfig>
 {
     private Animator _animator;
     private bool _canPlayReload = true;
     private bool _isReloading;
+    private ReloadComponent _reloadComponent;
 
     public override void Initialize(AnimationConfig config, Weapon weapon)
     {
         base.Initialize(config, weapon);
+
         _animator = GetComponentInParent<Animator>();
-
-    }
-    private void OnEnable()
-    {
-        AnimationEventProxy.OnReloadComplete += OnReloadAnimationComplete;
-        WeaponEvents.OnReload += PlayReloadAnimation;
-
     }
 
-    private void OnDisable()
+    private void Start()
     {
-        AnimationEventProxy.OnReloadComplete -= OnReloadAnimationComplete;
-        WeaponEvents.OnReload -= PlayReloadAnimation;
+        _reloadComponent = _weapon.GetWeaponComponent<ReloadComponent>();
     }
 
     public void PlayReloadAnimation()
     {
-        if (_canPlayReload)
+        if (_canPlayReload && !_isReloading)
         {
-            SetADS(false);
             _isReloading = true;
             _canPlayReload = false;
-    
+
+            _weapon.State.IsReloading = true;
+
+            SetADS(false);
 
             _animator.SetTrigger("Reload");
+
             Debug.Log("Playing reload animation");
         }
     }
-
-    public void SetADS(bool ads)
-    {
-        _animator.SetBool("ADS", ads);
-    }
     public void OnReloadAnimationComplete()
     {
+
+        if (!_isReloading)
+        {
+            return;
+        }
+
         Debug.Log("Completed reload animation");
 
-        // Update the ammo by calling CompleteReload from the ReloadComponent
-        var reloadComponent = _weapon.GetWeaponComponent<ReloadComponent>();
-        if (reloadComponent != null)
+        if (_reloadComponent != null)
         {
-            reloadComponent.CompleteReload();
+            _reloadComponent.CompleteReload();
         }
 
         _isReloading = false;
@@ -63,6 +55,12 @@ public class AnimationComponent : BaseComponent<AnimationConfig>
         _weapon.State.IsReloading = false;
     }
 
-
+    public void SetADS(bool ads)
+    {
+        if (_animator != null)
+        {
+            _animator.SetBool("ADS", ads);
+        }
+    }
 
 }

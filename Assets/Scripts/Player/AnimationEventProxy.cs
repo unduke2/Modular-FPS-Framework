@@ -3,10 +3,27 @@ using UnityEngine;
 
 public class AnimationEventProxy : MonoBehaviour
 {
-    public static event Action OnReloadComplete;
+    private AnimationComponent _animationComponent;
+
+    private void Start()
+    {
+        _animationComponent = GetComponentInChildren<AnimationComponent>();
+
+        if (_animationComponent == null)
+        {
+            Debug.LogWarning($"{nameof(AnimationEventProxy)}: No AnimationComponent found");
+        }
+    }
+
     public void ReloadComplete()
     {
-        Debug.Log("Animation Event Triggered: Reload Complete");
-        OnReloadComplete?.Invoke();
+        if (_animationComponent != null)
+        {
+            _animationComponent.OnReloadAnimationComplete();
+        }
+        else
+        {
+            Debug.LogWarning($"{nameof(AnimationEventProxy)}: No AnimationComponent reference found - cannot call OnReloadAnimationComplete");
+        }
     }
 }
