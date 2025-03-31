@@ -31,28 +31,29 @@ public class PlayerController : MonoBehaviour
     //[Header("Camera Settings")]
     //[SerializeField] private CinemachineCamera _cinemachineCamera;
 
-    private void Start()
+    private void Awake()
     {
         _playerMovement = GetComponent<PlayerMovement>();
-        _ikManager = GetComponent<IKManager>();
-      _animator = GetComponentInChildren<Animator>();
-        _input = GetComponent<PlayerInput>();
 
+        _animator = GetComponentInChildren<Animator>();
+
+        _input = GetComponent<PlayerInput>();
         _weaponInput = new WeaponInput();
         _movementInput = new MovementInput();
+
         _anchor = GetComponentInChildren<Anchor>();
-        _audioSource = GetComponentInChildren<AudioSource>();
 
-        _currentWeapon = WeaponFactory.CreateWeapon(_weaponData, _animator.GetBoneTransform(HumanBodyBones.RightHand).Find("WeaponSocket"), _cameraController, _weaponTargetTransform, _audioSource).GetComponent<Weapon>();
-
+        _currentWeapon = WeaponFactory.CreateWeapon(_weaponData,
+            _animator.GetBoneTransform(HumanBodyBones.RightHand).Find("WeaponSocket"),
+            _cameraController,
+            _weaponTargetTransform)
+            .GetComponent<Weapon>();
 
         if (_currentWeapon == null)
         {
             Debug.LogError("Weapon creation failed! Check WeaponData or WeaponFactory.");
             return;
         }
-
-
 
         Cursor.lockState = CursorLockMode.Locked;
     }

@@ -7,21 +7,25 @@ public class Weapon : MonoBehaviour
 {
 
     private Dictionary<Type, MonoBehaviour> componentMap = new Dictionary<Type, MonoBehaviour>();
-    private CameraController _holderCamera;
-    public WeaponState State = new WeaponState();
-    private Transform _weaponTargetTransform;
-    public AudioSource AudioSource;
 
-    public void Initialize(CameraController holderCamera, Transform weaponTargetTransform, AudioSource audioSource)
+    public WeaponState State = new WeaponState();
+
+    private FireComponent _fireComponent;
+    private ReloadComponent _reloadComponent;
+    private AimComponent _aimComponent;
+    private FlashlightComponent _flashLightComponent;
+
+
+    public void Initialize(CameraController holderCamera, Transform weaponTargetTransform)
     {
 
-        foreach (var component in GetComponentsInChildren<MonoBehaviour>()) // Search entire hierarchy
+        foreach (var component in GetComponentsInChildren<MonoBehaviour>())
         {
             Debug.Log($"Weapon.Initialize: Found component {component.GetType()} on {component.gameObject.name}.");
 
-            // Check if the component inherits from BaseComponent<TConfig> where TConfig : WeaponBehaviourConfig
-            var baseType = component.GetType().BaseType; // Get the base type
-            if (baseType != null && baseType.IsGenericType &&
+            var baseType = component.GetType().BaseType;
+            if (baseType != null && 
+                baseType.IsGenericType &&
                 baseType.GetGenericTypeDefinition() == typeof(BaseComponent<>) &&
                 typeof(WeaponBehaviourConfig).IsAssignableFrom(baseType.GetGenericArguments()[0]))
             {
@@ -33,20 +37,24 @@ public class Weapon : MonoBehaviour
                 Debug.LogWarning($"Weapon.Initialize: Skipping {component.GetType()} (not a valid BaseComponent<WeaponBehaviourConfig>).");
             }
         }
-        State.AudioSource = audioSource;
+
         State.HolderCamera = holderCamera;
         State.IsReloading = false;
-        SetWeaponTargetTransform( weaponTargetTransform );
+
+        _fireComponent = GetWeaponComponent<FireComponent>();
+        _reloadComponent = GetWeaponComponent<ReloadComponent>();
+        _aimComponent = GetWeaponComponent<AimComponent>();
+        _flashLightComponent = GetWeaponComponent<FlashlightComponent>();
         
-
-
         Debug.Log($"Weapon.Initialize: Total components mapped: {componentMap.Count}");
     }
+
+
     public T GetWeaponComponent<T>() where T : MonoBehaviour
     {
         foreach (var kvp in componentMap)
         {
-            if (typeof(T).IsAssignableFrom(kvp.Key)) // Match derived types
+            if (typeof(T).IsAssignableFrom(kvp.Key))
             {
                 return kvp.Value as T;
             }
@@ -55,72 +63,49 @@ public class Weapon : MonoBehaviour
     }
 
 
-
     public void HandleInput(WeaponInput input)
     {
 
-
-        var fireComponent = GetWeaponComponent<FireComponent>();
-        if (fireComponent != null)
+        if (_fireComponent != null)
         {
             if (input.Fire)
             {
-                fireComponent.HandleFire();
+                _fireComponent.HandleFire();
 
             }
             else
             {
-                fireComponent.HandleFireReleased();
+                _fireComponent.HandleFireReleased();
             }
         }
-        else
-        {
-            Debug.Log("FireComponent is null");
-        }
 
-        var reloadComponent = GetWeaponComponent<ReloadComponent>();
-        if (reloadComponent != null)
+        if (_reloadComponent != null)
         {
 
             if (input.Reload)
             {
-                reloadComponent.HandleReload();
+                _reloadComponent.HandleReload();
             }
         }
 
-        var flashlightComponent = GetWeaponComponent<FlashlightComponent>();
-        if (flashlightComponent != null)
+        if (_flashLightComponent != null)
         {
             if (input.ToggleFlashlight)
             {
-                flashlightComponent.HandleFlashlight();
+                _flashLightComponent.HandleFlashlight();
             }
         }
 
-        // Aim logic - use the AimComponent to toggle ADS or HipFire mode
-        var aimComponent = GetWeaponComponent<AimComponent>();
-        if (aimComponent != null)
+        if (_aimComponent != null)
         {
-            // Assume that when "Aim" is true, we're in ADS mode,
-            // otherwise we're in HipFire mode.
             if (input.Aim)
             {
-                aimComponent.SetAimingMode(AimingMode.ADS);
+                _aimComponent.SetAimingMode(AimingMode.ADS);
             }
             else
             {
-                aimComponent.SetAimingMode(AimingMode.HipFire);
+                _aimComponent.SetAimingMode(AimingMode.HipFire);
             }
-        }
-
-    }
-
-    private void SetWeaponTargetTransform(Transform transform)
-    {
-        var transformComponent = GetWeaponComponent<TransformComponent>();
-        if (transformComponent != null)
-        {
-            transformComponent.SetWeaponTargetTransform(transform);
         }
     }
 }
