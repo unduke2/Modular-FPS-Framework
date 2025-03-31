@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Anchor : MonoBehaviour
+public class CameraTarget : MonoBehaviour
 {
     [SerializeField] private float _pitchSensitivity = 1f;
     [SerializeField] private float _minPitch = -60f;

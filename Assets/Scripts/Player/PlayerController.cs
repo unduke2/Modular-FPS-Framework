@@ -1,35 +1,27 @@
-using Unity.Cinemachine;
 using UnityEngine;
-using UnityEngine.Animations.Rigging;
-using UnityEngine.Rendering;
 
 
 public class PlayerController : MonoBehaviour
 {
 
     private PlayerMovement _playerMovement;
-    private Anchor _anchor;
+
+    private CameraTarget _cameraTarget;
+
+    private Animator _animator;
+
     private PlayerInput _input;
-    private Weapon _currentWeapon;
     private WeaponInput _weaponInput;
     private MovementInput _movementInput;
-    private IKManager _ikManager;
+
+    private Weapon _currentWeapon;
+
     [SerializeField] private CameraController _cameraController;
-    private IKRig _ikRig;
-    private RigBuilder _rigBuilder;
-
-
 
     [Header("Weapon Settings")]
     [SerializeField] private WeaponData _weaponData;
-    private Animator _animator;
     [SerializeField] private Transform _weaponTargetTransform;
-    private AudioSource _audioSource;
 
-    
-
-    //[Header("Camera Settings")]
-    //[SerializeField] private CinemachineCamera _cinemachineCamera;
 
     private void Awake()
     {
@@ -41,7 +33,7 @@ public class PlayerController : MonoBehaviour
         _weaponInput = new WeaponInput();
         _movementInput = new MovementInput();
 
-        _anchor = GetComponentInChildren<Anchor>();
+        _cameraTarget = GetComponentInChildren<CameraTarget>();
 
         _currentWeapon = WeaponFactory.CreateWeapon(_weaponData,
             _animator.GetBoneTransform(HumanBodyBones.RightHand).Find("WeaponSocket"),
@@ -58,55 +50,66 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
     }
 
+
     private void Update()
     {
-        if (_input != null)
+        if (_input == null)
         {
-            HandleMovementInput();
-            HandleWeaponInput();
-        } else
-        {
-            Debug.Log("Input is null");
+            Debug.LogWarning($"{nameof(PlayerController)}: No PlayerInput found.");
+            return;
         }
+        HandleMovementInput();
+        HandleWeaponInput();
 
-        _animator.SetFloat("Velocity", _playerMovement.CurrentMovementVelocity.magnitude);
-
-
+        if (_playerMovement != null)
+        {
+            _animator.SetFloat("Velocity", _playerMovement.CurrentMovementVelocity.magnitude);
+        }
     }
+
 
     private void LateUpdate()
     {
-        _anchor.UpdatePitch(_input.MousePosInput.y);
+        if (_cameraTarget != null && _input != null)
+        {
+            _cameraTarget.UpdatePitch(_input.MousePosInput.y);
+        }
     }
+
 
     private void HandleWeaponInput()
     {
-        _weaponInput.Fire = _input.FireInput;
-        _weaponInput.Reload = _input.ReloadInput;
-        _weaponInput.ToggleFlashlight = _input.FlashLightInput;
-        _weaponInput.Aim = _input.AimInput;
+        if (_currentWeapon == null)
+        {
+            Debug.LogWarning($"{nameof(PlayerController)}: No weapon available to handle input.");
+            return;
+        }
 
-        if (_currentWeapon != null)
+        _currentWeapon.HandleInput(new WeaponInput
         {
-            _currentWeapon.HandleInput(_weaponInput);
-        }
-         else
-        {
-            Debug.Log("Weapon is null");
-        }
+            Fire = _input.FireInput,
+            Reload = _input.ReloadInput,
+            ToggleFlashlight = _input.FlashLightInput,
+            Aim = _input.AimInput,
+        });
     }
+
+
     private void HandleMovementInput()
     {
-        _movementInput.DirectionInput = _input.DirectionInput;
-        _movementInput.SprintInput = _input.SprintInput;
-        _movementInput.JumpInput = _input.JumpInput;
-        _movementInput.LookInputX = _input.MousePosInput.x;
-        _movementInput.CrouchInput = _input.CrouchInput;
-        if (_playerMovement != null)
+        if (_playerMovement == null)
         {
-            _playerMovement.HandleInput(_movementInput);
+            Debug.LogWarning($"{nameof(PlayerController)}: No PlayerMovement script found.");
+            return;
         }
-    }
 
-  
+        _playerMovement.HandleInput(new MovementInput
+        {
+            DirectionInput = _movementInput.DirectionInput,
+            SprintInput = _movementInput.SprintInput,
+            JumpInput = _movementInput.JumpInput,
+            LookInputX = _movementInput.LookInputX,
+            CrouchInput = _movementInput.CrouchInput
+        });
+    }
 }

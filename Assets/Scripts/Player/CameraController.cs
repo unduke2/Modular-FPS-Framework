@@ -23,21 +23,21 @@ public class CameraController : MonoBehaviour
     {
         // Assume recoilOffset is a float representing the pitch change (in degrees).
         // Get the Anchor component attached to the target transform.
-        Anchor anchor = _targetTransform.GetComponent<Anchor>();
-        if (anchor != null)
+        CameraTarget cameraTarget = _targetTransform.GetComponent<CameraTarget>();
+        if (cameraTarget != null)
         {
             // Set the recoil offset. (You could also accumulate it if needed.)
-            anchor.RecoilOffset = recoilOffset;
+            cameraTarget.RecoilOffset = recoilOffset;
         }
     }
 
     public void RecoverRecoil(float recoverySpeed)
     {
-        Anchor anchor = _targetTransform.GetComponent<Anchor>();
-        if (anchor != null)
+        CameraTarget cameraTarget = _targetTransform.GetComponent<CameraTarget>();
+        if (cameraTarget != null)
         {
             // Smoothly recover recoil by lerping the recoil offset toward 0.
-            anchor.RecoilOffset = Mathf.Lerp(anchor.RecoilOffset, 0f, Time.deltaTime * recoverySpeed);
+            cameraTarget.RecoilOffset = Mathf.Lerp(cameraTarget.RecoilOffset, 0f, Time.deltaTime * recoverySpeed);
         }
     }
 
