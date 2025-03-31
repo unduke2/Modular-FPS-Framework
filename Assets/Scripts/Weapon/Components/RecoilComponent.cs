@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class RecoilComponent : BaseComponent<RecoilConfig>
 {
-    // This value represents the accumulated recoil (affecting pitch).
     private float _currentRecoilOffset;
 
+    private CameraController _cameraController;
 
     public override void Initialize(RecoilConfig config, Weapon weapon)
     {
@@ -12,31 +12,14 @@ public class RecoilComponent : BaseComponent<RecoilConfig>
       
     }
 
-    public void ApplyRecoil()
+    private void Start()
     {
-        // Increase the recoil offset by the configured amount.
-        _currentRecoilOffset -= _config.RecoilAmount;
+        _cameraController = _weapon.State.HolderCamera;
 
-        // Get the camera controller from the weapon.
-        var cameraController = _weapon.State.HolderCamera;
-        if (cameraController != null)
+        if (_cameraController == null)
         {
-            // Pass the recoil offset to the camera controller.
-            // You might want to adjust the divisor based on desired strength.
-            cameraController.ApplyRecoil(_currentRecoilOffset / 2f);
+            Debug.LogWarning($"{nameof(RecoilComponent)}: No CameraController assigned in WeaponState");
         }
-        else
-        {
-            Debug.Log("Camera controller is null");
-        }
-
-        //var transformComponent = _weapon.GetWeaponComponent<TransformComponent>();
-        //if (transformComponent != null)
-        //{
-        //    transformComponent.ApplyKickback(new Vector3(0f, 0f, - _config.KickbackAmount), 10f);
-
-        //}
-
     }
 
     private void Update()
@@ -44,27 +27,33 @@ public class RecoilComponent : BaseComponent<RecoilConfig>
         RecoverRecoil();
     }
 
+    public void ApplyRecoil()
+    {
+        _currentRecoilOffset -= _config.RecoilAmount;
+
+        if (_cameraController != null)
+        {
+            _cameraController.ApplyRecoil(_currentRecoilOffset / 2f);
+        }
+        else
+        {
+            Debug.Log("Camera controller is null - cannot apply recoil offset.");
+        }
+    }
+
     public void RecoverRecoil()
     {
-        // Smoothly recover the recoil offset toward zero.
-        _currentRecoilOffset = Mathf.Lerp(_currentRecoilOffset, 0f, Time.deltaTime * _config.RecoilRecoverySpeed);
+        //Gotta try Mathf.MoveTowards for a different feel if needed
+        _currentRecoilOffset = Mathf.Lerp(
+            _currentRecoilOffset,
+            0f, 
+            Time.deltaTime * _config.RecoilRecoverySpeed
+            );
 
-        var cameraController = _weapon.State.HolderCamera;
-        if (cameraController != null)
+        if (_cameraController != null)
         {
-            cameraController.RecoverRecoil(_config.RecoilRecoverySpeed);
+            _cameraController.RecoverRecoil(_config.RecoilRecoverySpeed);
         }
-
-        //// NEW: Also recover kickback by setting its target offset to zero.
-        //var transformComponent = _weapon.GetWeaponComponent<TransformComponent>();
-        //if (transformComponent != null)
-        //{
-        //    var aimingComponent = _weapon.GetWeaponComponent<AimComponent>();
-        //    if (aimingComponent != null)
-        //    {
-        //        transformComponent.ApplyKickback(aimingComponent.GetCurrentAimingModeData().PositionOffset, _config.RecoilRecoverySpeed);
-        //    }
-        //}
     }
 }
 
