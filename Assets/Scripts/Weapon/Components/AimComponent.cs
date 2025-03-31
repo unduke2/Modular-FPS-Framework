@@ -4,22 +4,27 @@ public class AimComponent : BaseComponent<AimConfig>
 {
     private AimingModeData _currentAimingModeData;
     private AimingMode _currentAimingMode;
+    private AnimationComponent _animationComponent;
 
     public override void Initialize(AimConfig config, Weapon weapon)
     {
         base.Initialize(config, weapon);
     }
 
+    private void Start()
+    {
+        _animationComponent = _weapon.GetWeaponComponent<AnimationComponent>();
+    }
 
 
     public void SetAimingMode(AimingMode mode)
     {
-        // Only update if the mode changes.
         if (_currentAimingMode == mode)
             return;
         
         _currentAimingMode = mode;
-        // Retrieve the data for the current aiming mode.
+
+
         var data = _config.AimingData.GetAimingModeData(_currentAimingMode);
         if (data != null)
         {
@@ -27,25 +32,20 @@ public class AimComponent : BaseComponent<AimConfig>
 
             WeaponEvents.ChangeAimingModeSpread(data.SpreadMultiplier);
 
-            // Update camera FOV, sensitivity, etc.
             var cameraController = _weapon.State.HolderCamera;
             if (cameraController != null)
             {
                 cameraController.SetFOV(data.FieldOfView, data.TransitionSpeed);
-                // Optionally adjust camera sensitivity, etc.
             }
             else
             {
                 Debug.LogWarning("Camera controller is null");
             }
             
-            // Notify animation component (which can use PositionOffset/RotationOffset if needed)
-            var animationComponent = _weapon.GetWeaponComponent<AnimationComponent>();
-            if (animationComponent != null)
+            if (_animationComponent != null)
             {
-                // For ADS, we might use an additive ADS animation or IK adjustment.
                 bool isADS = (_currentAimingMode == AimingMode.ADS);
-                animationComponent.SetADS(isADS);
+                _animationComponent.SetADS(isADS);
             }
         }
         else
