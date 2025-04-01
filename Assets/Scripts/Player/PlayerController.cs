@@ -63,7 +63,7 @@ public class PlayerController : MonoBehaviour
 
         if (_playerMovement != null)
         {
-            _animator.SetFloat("Velocity", _playerMovement.CurrentMovementVelocity.magnitude);
+            _animator.SetFloat("Velocity", _playerMovement.HorizontalVelocity.magnitude);
         }
     }
 
