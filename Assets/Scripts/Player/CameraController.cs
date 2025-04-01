@@ -1,64 +1,98 @@
+using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
-using System.Collections;
 
 public class CameraController : MonoBehaviour
 {
     private CinemachineCamera _cinemachineCamera;
     private Transform _targetTransform;
+
     private float _defaultFOV;
     private float _targetFOV;
+
+    private CameraTarget _cameraTarget;
+
     private Coroutine _smoothFOVCoroutine;
+
+
+    private void Awake()
+    {
+        _cinemachineCamera = GetComponent<CinemachineCamera>();
+    }
+
 
     private void Start()
     {
-        _cinemachineCamera = GetComponent<CinemachineCamera>();
+        if (_cinemachineCamera == null)
+        {
+            Debug.LogError($"{nameof(CameraController)}: No CinemachineCamera found on this GameObject");
+        }
+
         _defaultFOV = _cinemachineCamera.Lens.FieldOfView;
         _targetFOV = _defaultFOV;
+
         _targetTransform = _cinemachineCamera.Target.TrackingTarget;
+        _cameraTarget = _targetTransform.GetComponent<CameraTarget>();
     }
 
-    // Instead of directly modifying localRotation, update the recoil value on the Anchor.
+
     public void ApplyRecoil(float recoilOffset)
     {
-        // Assume recoilOffset is a float representing the pitch change (in degrees).
-        // Get the Anchor component attached to the target transform.
-        CameraTarget cameraTarget = _targetTransform.GetComponent<CameraTarget>();
-        if (cameraTarget != null)
+        if (_cameraTarget != null)
         {
-            // Set the recoil offset. (You could also accumulate it if needed.)
-            cameraTarget.RecoilOffset = recoilOffset;
+            _cameraTarget.RecoilOffset = recoilOffset;
+        }
+        else
+        {
+            Debug.LogWarning($"{nameof(CameraController)}: No CameraTarget found on tracking target for recoil");
         }
     }
+
 
     public void RecoverRecoil(float recoverySpeed)
     {
-        CameraTarget cameraTarget = _targetTransform.GetComponent<CameraTarget>();
-        if (cameraTarget != null)
+        if (_cameraTarget != null)
         {
-            // Smoothly recover recoil by lerping the recoil offset toward 0.
-            cameraTarget.RecoilOffset = Mathf.Lerp(cameraTarget.RecoilOffset, 0f, Time.deltaTime * recoverySpeed);
+            _cameraTarget.RecoilOffset = Mathf.Lerp(_cameraTarget.RecoilOffset,
+                0f,
+                Time.deltaTime * recoverySpeed
+                );
         }
     }
+
 
     public void SetFOV(float targetFOV, float transitionSpeed)
     {
         if (_smoothFOVCoroutine != null)
         {
             StopCoroutine(_smoothFOVCoroutine);
-            _smoothFOVCoroutine = null;
         }
+
         _smoothFOVCoroutine = StartCoroutine(SmoothFOVRoutine(targetFOV, transitionSpeed));
     }
+
+
     private IEnumerator SmoothFOVRoutine(float targetFOV, float transitionSpeed)
     {
-        float elapsed = 0f;
-        while (elapsed < 1f)
+        if (_cinemachineCamera == null)
         {
-            elapsed += Time.deltaTime * transitionSpeed;
-            _cinemachineCamera.Lens.FieldOfView = Mathf.Lerp(_cinemachineCamera.Lens.FieldOfView, targetFOV, elapsed);
+            yield break;
+        }
+
+        float startFOV = _cinemachineCamera.Lens.FieldOfView;
+        float timeElapsed = 0f;
+
+        while (timeElapsed < 1f)
+        {
+            timeElapsed += Time.deltaTime * transitionSpeed;
+
+            _cinemachineCamera.Lens.FieldOfView = Mathf.Lerp(startFOV,
+                targetFOV,
+                timeElapsed);
+
             yield return null;
         }
         _cinemachineCamera.Lens.FieldOfView = targetFOV;
+        _smoothFOVCoroutine = null;
     }
 }
