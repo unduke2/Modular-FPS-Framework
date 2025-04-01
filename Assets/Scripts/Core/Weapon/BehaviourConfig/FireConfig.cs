@@ -19,6 +19,10 @@ public class FireConfig : WeaponBehaviourConfig
 
     public float BulletHoleOffset;
 
+    public AudioClip EmptySound;
+
+    public AudioClip GunshotSound;
+
     public override void Apply(GameObject weaponObject, Weapon weapon)
     {
         Debug.Log($"FireConfig: Applying FireComponent to {weaponObject.name}.");

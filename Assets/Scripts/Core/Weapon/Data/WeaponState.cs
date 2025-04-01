@@ -16,7 +16,8 @@ public class WeaponState
     public bool IsADS;
     public float ADSFOV;
 
-    public AudioSource GunshotAudioSource;
+    public AudioSource MuzzleAudioSource;
+    public AudioSource MagazineAudioSource;
 
 
 }

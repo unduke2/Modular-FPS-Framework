@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: New Reload Config
   m_EditorClassIdentifier: 
   MagazineSize: 17
+  TotalAmmo: 50
+  ReloadSound: {fileID: 8300000, guid: 48b0185452b0bee4d847279bd2475599, type: 3}

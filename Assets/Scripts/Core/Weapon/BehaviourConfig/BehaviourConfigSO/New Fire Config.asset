@@ -20,3 +20,5 @@ MonoBehaviour:
   MuzzleFlashPrefab: {fileID: 5377767129496358887, guid: 8d151d690a5fbec44a988e4cf4d9427c, type: 3}
   BulletHolePrefab: {fileID: 114900699382448101, guid: 5e656316de5d990478339fa75a9c1aa6, type: 3}
   BulletHoleOffset: 0.01
+  EmptySound: {fileID: 8300000, guid: c65bc3f8aa4f547408abea96b0db746d, type: 3}
+  GunshotSound: {fileID: 8300000, guid: a6c472d779170c04682762eb0193be34, type: 3}

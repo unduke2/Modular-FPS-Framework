@@ -17,7 +17,7 @@ public class AnimationEventAdder
         AnimationEvent evt = new AnimationEvent();
         evt.functionName = "ReloadComplete";
         // Set the event time – for example, near the end of the clip:
-        evt.time = clip.length - 0.1f;
+        evt.time = clip.length - 1f;
 
         // Get any existing events, add our new event, and set them back.
         AnimationEvent[] events = AnimationUtility.GetAnimationEvents(clip);

@@ -1,10 +1,14 @@
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 
 public class Player : MonoBehaviour
 {
 
     private PlayerMovement _playerMovement;
+
+    private IKConstraints _constraints;
+    private RigBuilder _rigBuilder;
 
     private CameraTarget _cameraTarget;
 
@@ -27,6 +31,11 @@ public class Player : MonoBehaviour
     {
         _playerMovement = GetComponent<PlayerMovement>();
 
+        _constraints = GetComponentInChildren<IKConstraints>();
+        _rigBuilder = GetComponentInChildren<RigBuilder>();
+
+
+
         _animator = GetComponentInChildren<Animator>();
 
         _input = GetComponent<PlayerInput>();
@@ -40,6 +49,13 @@ public class Player : MonoBehaviour
             _cameraController,
             _weaponTargetTransform)
             .GetComponent<Weapon>();
+
+        if (_currentWeapon != null && _constraints != null)
+        {
+            _constraints.SetIKConstraintTargets(_currentWeapon.transform.Find("LeftIKWeapon_mag"), _currentWeapon.transform.Find("LeftIKWeapon_slide"), _currentWeapon.transform.Find("LeftIKWeapon_handle"));
+            _rigBuilder.Build();
+        }
+  
 
         if (_currentWeapon == null)
         {

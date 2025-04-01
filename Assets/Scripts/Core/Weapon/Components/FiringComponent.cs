@@ -12,6 +12,7 @@ public class FireComponent : BaseComponent<FireConfig>
     private FireMode _currentFireMode;
     private SpreadComponent _spreadComponent;
     private RecoilComponent _recoilComponent;
+    AudioSource _muzzleAudioSource;
 
     public override void Initialize(FireConfig config, Weapon weapon)
     {
@@ -25,6 +26,7 @@ public class FireComponent : BaseComponent<FireConfig>
         }
 
         _currentFireMode = _config.DefaultFireMode;
+        _muzzleAudioSource = _weapon.State.MuzzleAudioSource;
         Debug.Log($"FireComponent: Initialized with FireMode {_currentFireMode} and FireRate {_config.FireRate}.");
     }
 
@@ -142,6 +144,10 @@ public class FireComponent : BaseComponent<FireConfig>
         // If there is no ammo, do not proceed with shooting logic.
         if (_weapon.State.CurrentAmmo <= 0)
         {
+            if (_muzzleAudioSource != null && _config.EmptySound != null)
+            {
+                _muzzleAudioSource.PlayOneShot(_config.EmptySound);
+            }
             Debug.Log("No ammo left!");
             return;
         }
@@ -190,10 +196,9 @@ public class FireComponent : BaseComponent<FireConfig>
             Destroy(flash, 0.5f);
         }
 
-        AudioSource gunshotAudioSource = _weapon.State.GunshotAudioSource;
-        if (gunshotAudioSource != null && gunshotAudioSource.clip != null)
+        if (_muzzleAudioSource != null && _config.GunshotSound != null)
         {
-            gunshotAudioSource.PlayOneShot(gunshotAudioSource.clip);
+            _muzzleAudioSource.PlayOneShot(_config.GunshotSound);
         }
 
         // === Decrement Ammo ===

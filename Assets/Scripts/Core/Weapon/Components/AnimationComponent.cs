@@ -23,6 +23,7 @@ public class AnimationComponent : BaseComponent<AnimationConfig>
     {
         if (_canPlayReload && !_isReloading)
         {
+
             _isReloading = true;
             _canPlayReload = false;
 
@@ -30,6 +31,7 @@ public class AnimationComponent : BaseComponent<AnimationConfig>
 
             SetADS(false);
 
+            _animator.SetBool("IsReloading", true);
             _animator.SetTrigger("Reload");
 
             Debug.Log("Playing reload animation");
@@ -50,6 +52,7 @@ public class AnimationComponent : BaseComponent<AnimationConfig>
             _reloadComponent.CompleteReload();
         }
 
+        _animator.SetBool("IsReloading", false);
         _isReloading = false;
         _canPlayReload = true;
         _weapon.State.IsReloading = false;

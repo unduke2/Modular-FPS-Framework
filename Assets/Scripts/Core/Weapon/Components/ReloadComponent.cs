@@ -5,6 +5,7 @@ public class ReloadComponent : BaseComponent<ReloadConfig>
 {
     private int _totalAmmo;
 
+    private AudioSource _magazineAudioSource;
     private AnimationComponent _animationComponent;
     public override void Initialize(ReloadConfig config, Weapon weapon)
     {
@@ -19,6 +20,7 @@ public class ReloadComponent : BaseComponent<ReloadConfig>
     private void Start()
     {
         _animationComponent = _weapon.GetWeaponComponent<AnimationComponent>();
+        _magazineAudioSource = _weapon.State.MagazineAudioSource;
     }
     public void HandleReload()
     {
@@ -28,6 +30,11 @@ public class ReloadComponent : BaseComponent<ReloadConfig>
     {
         return;
     }
+
+        if (_magazineAudioSource != null && _config.ReloadSound != null)
+        {
+            _magazineAudioSource.PlayOneShot(_config.ReloadSound);
+        }
 
         if (_animationComponent != null)
         {
