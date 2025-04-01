@@ -105,11 +105,11 @@ public class PlayerController : MonoBehaviour
 
         _playerMovement.HandleInput(new MovementInput
         {
-            DirectionInput = _movementInput.DirectionInput,
-            SprintInput = _movementInput.SprintInput,
-            JumpInput = _movementInput.JumpInput,
-            LookInputX = _movementInput.LookInputX,
-            CrouchInput = _movementInput.CrouchInput
+            DirectionInput = _input.DirectionInput,
+            SprintInput = _input.SprintInput,
+            JumpInput = _input.JumpInput,
+            LookInputX = _input.MousePosInput.x,
+            CrouchInput = _input.CrouchInput
         });
     }
 }

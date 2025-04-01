@@ -10,13 +10,13 @@ public class WeaponState
     public Transform RightHandIKTarget;
     public Transform LeftHandIKTarget;
 
-    public AudioSource AudioSource;
 
     public CameraController HolderCamera;
 
     public bool IsADS;
     public float ADSFOV;
 
+    public AudioSource GunshotAudioSource;
 
 
 }

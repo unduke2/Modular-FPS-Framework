@@ -10,7 +10,9 @@ public class WeaponFactory : MonoBehaviour
         
         Weapon weapon = weaponObject.GetComponent<Weapon>() ?? weaponObject.AddComponent<Weapon>();
 
-        weapon.State.MuzzleTransform = weaponObject.transform.Find("Muzzle");
+        var muzzle = weaponObject.transform.Find("Muzzle");
+        weapon.State.MuzzleTransform = muzzle;
+        weapon.State.GunshotAudioSource = muzzle.GetComponent<AudioSource>();
 
         foreach (var config in data.BehaviourConfigs)
         {

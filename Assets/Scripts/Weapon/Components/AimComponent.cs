@@ -5,6 +5,7 @@ public class AimComponent : BaseComponent<AimConfig>
     private AimingModeData _currentAimingModeData;
     private AimingMode _currentAimingMode;
     private AnimationComponent _animationComponent;
+    private SpreadComponent _spreadComponent;
 
     public override void Initialize(AimConfig config, Weapon weapon)
     {
@@ -14,6 +15,7 @@ public class AimComponent : BaseComponent<AimConfig>
     private void Start()
     {
         _animationComponent = _weapon.GetWeaponComponent<AnimationComponent>();
+        _spreadComponent = _weapon.GetWeaponComponent<SpreadComponent>();
     }
 
 
@@ -30,7 +32,10 @@ public class AimComponent : BaseComponent<AimConfig>
         {
             _currentAimingModeData = data;
 
-            WeaponEvents.ChangeAimingModeSpread(data.SpreadMultiplier);
+            if (_spreadComponent != null)
+            {
+                _spreadComponent.SetAimModeSpread(data.SpreadMultiplier);
+            }
 
             var cameraController = _weapon.State.HolderCamera;
             if (cameraController != null)

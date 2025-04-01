@@ -139,13 +139,14 @@ public class FireComponent : BaseComponent<FireConfig>
             return;
         }
 
+        // If there is no ammo, do not proceed with shooting logic.
         if (_weapon.State.CurrentAmmo <= 0)
         {
             Debug.Log("No ammo left!");
+            return;
         }
 
-
-
+        // === Spread / Recoil Logic ===
         Vector3 muzzleForward = _weapon.State.MuzzleTransform.forward;
         Vector3 bulletDir = muzzleForward;
 
@@ -159,6 +160,7 @@ public class FireComponent : BaseComponent<FireConfig>
             _recoilComponent.ApplyRecoil();
         }
 
+        // === Raycast Logic ===
         if (Physics.Raycast(_weapon.State.MuzzleTransform.position, bulletDir, out RaycastHit hit, _config.HitRange))
         {
             Debug.Log($"Hit {LayerMask.LayerToName(hit.collider.gameObject.layer)}");
@@ -166,11 +168,8 @@ public class FireComponent : BaseComponent<FireConfig>
             if (_config.BulletHolePrefab != null)
             {
                 Quaternion decalRotation = Quaternion.LookRotation(-hit.normal);
-
                 Vector3 decalPosition = hit.point + hit.normal * _config.BulletHoleOffset;
-
                 GameObject bulletHole = Instantiate(_config.BulletHolePrefab, decalPosition, decalRotation);
-
                 Destroy(bulletHole, 10f);
             }
         }
@@ -179,22 +178,25 @@ public class FireComponent : BaseComponent<FireConfig>
             Debug.Log("No hit");
         }
 
-        GameObject flash = Instantiate(
-          _config.MuzzleFlashPrefab,
-          _weapon.State.MuzzleTransform.position,
-          _weapon.State.MuzzleTransform.rotation);
+        // === Muzzle Flash / Audio ===
+        if (_config.MuzzleFlashPrefab != null)
+        {
+            GameObject flash = Instantiate(
+                _config.MuzzleFlashPrefab,
+                _weapon.State.MuzzleTransform.position,
+                _weapon.State.MuzzleTransform.rotation
+            );
+            flash.transform.parent = _weapon.State.MuzzleTransform;
+            Destroy(flash, 0.5f);
+        }
 
-        flash.transform.parent = _weapon.State.MuzzleTransform;
-
-        Destroy(flash, 0.5f);
-
-        AudioSource gunshotAudioSource = _config.GunshotAudioSource;
+        AudioSource gunshotAudioSource = _weapon.State.GunshotAudioSource;
         if (gunshotAudioSource != null && gunshotAudioSource.clip != null)
         {
             gunshotAudioSource.PlayOneShot(gunshotAudioSource.clip);
         }
 
-
+        // === Decrement Ammo ===
         _weapon.State.CurrentAmmo--;
         Debug.Log("Fired a bullet! Current ammo: " + _weapon.State.CurrentAmmo);
     }

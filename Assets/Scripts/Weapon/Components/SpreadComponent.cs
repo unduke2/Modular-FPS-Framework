@@ -8,7 +8,9 @@ public class SpreadComponent : BaseComponent<SpreadConfig>
 
     private float _stanceMultiplier = 1f;
 
-    private float _adsMultiplier = 1f;
+    private float _aimModeMultiplier = 1f;
+
+    private float _hipFireMultiplier;
 
     private float _spreadRecoveryMultiplier = 1f;
 
@@ -55,16 +57,11 @@ public class SpreadComponent : BaseComponent<SpreadConfig>
     }
 
 
-    public void SetAimModeSpread(float spreadMultiplier, AimingMode aimingMode)
+    public void SetAimModeSpread(float spreadMultiplier)
     {
-        switch (aimingMode)
-        {
-            case AimingMode.ADS:
-                _adsMultiplier = spreadMultiplier;
-                Debug.Log($"{nameof(SpreadComponent)}: Setting ADS multiplier to {spreadMultiplier}");
-                break;
-                //Add more as needed
-        }
+        _aimModeMultiplier = spreadMultiplier;
+
+        Debug.Log($"{nameof(SpreadComponent)}: Set aim mode spread multiplier to {_aimModeMultiplier}");
 
         UpdateTargetSpread();
     }
@@ -72,7 +69,7 @@ public class SpreadComponent : BaseComponent<SpreadConfig>
 
     private void UpdateTargetSpread()
     {
-        _targetSpread = _config.BaseSpread * _stanceMultiplier * _adsMultiplier;
+        _targetSpread = _config.BaseSpread * _stanceMultiplier * _aimModeMultiplier;
         Debug.Log($"{nameof(SpreadComponent)}: New target spread: {_targetSpread}");
     }
 

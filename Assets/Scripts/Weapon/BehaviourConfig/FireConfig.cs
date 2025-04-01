@@ -4,14 +4,21 @@ using UnityEngine;
 public class FireConfig : WeaponBehaviourConfig
 {
     public FireMode[] FireModes;
+
     public float FireRate;
+
     public FireMode DefaultFireMode;
+
     public int BurstCount;
+
     public float HitRange = 200f;
+
     public GameObject MuzzleFlashPrefab;
+
     public GameObject BulletHolePrefab;
+
     public float BulletHoleOffset;
-    public AudioSource GunshotAudioSource;
+
     public override void Apply(GameObject weaponObject, Weapon weapon)
     {
         Debug.Log($"FireConfig: Applying FireComponent to {weaponObject.name}.");
