@@ -36,9 +36,9 @@ A highly modular and scalable first-person shooter framework built in Unity, emp
 - `AimComponent.cs` - Manages aiming modes (ADS, HipFire) and related animations.
 
 **Player**
-- `PlayerController.cs` - Handles player input and interactions.
+- `Player.cs` - Handles player input and interactions.
 - `PlayerMovement.cs` - Manages character physics, movement, and stances.
-- `Anchor.cs` - Controls weapon and camera pitch adjustments.
+- `CameraTarget.cs` - Controls weapon and camera pitch adjustments.
 
 **Camera**
 - `CameraController.cs` - Handles FOV changes, recoil application, and camera transitions.
