@@ -92,7 +92,11 @@ public class Weapon : MonoBehaviour
         {
             if (input.ToggleFlashlight)
             {
-                _flashLightComponent.HandleFlashlight();
+                _flashLightComponent.HandleFlashlightPressed();
+            }
+            else
+            {
+                _flashLightComponent.HandleFlashlightReleased();
             }
         }
 

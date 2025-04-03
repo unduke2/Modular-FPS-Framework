@@ -1,30 +1,41 @@
-using System;
 using UnityEngine;
 
 public class FlashlightComponent : BaseComponent<FlashlightConfig>
 {
-    private bool _isFlashlightOn;
-    private GameObject _flashlightObject;
-
+    private bool _isFlashlightOn = false;
+    private GameObject _flashlight;
+    private bool _canToggle;
 
     public override void Initialize(FlashlightConfig config, Weapon weapon)
     {
         base.Initialize(config, weapon);
-       
+        _flashlight = _weapon.transform.Find("Flashlight").GetChild(0).gameObject;
     }
 
 
-    public void HandleFlashlight()
+    public void HandleFlashlightPressed()
     {
-        if (_isFlashlightOn)
+        if (_flashlight == null)
         {
-             _config.FlashlightObject.SetActive(false);
-            _isFlashlightOn = false;
+            Debug.LogWarning($"{nameof(FlashlightComponent)}: Flashlight object is missing");
+            return;
         }
-        else
+
+        if (_canToggle)
         {
-            _config.FlashlightObject.SetActive(true);
-            _isFlashlightOn = true;
+            _canToggle = false;
+
+            _isFlashlightOn = !_isFlashlightOn;
+
+            AudioClip audioClip = _isFlashlightOn ? _config._flashlightEnabled : _config._flashlightDisabled;
+            _weapon.State.FlashlightAudioSource.PlayOneShot(audioClip);
+
+            _flashlight.SetActive(_isFlashlightOn);
         }
+    }
+
+    public void HandleFlashlightReleased()
+    {
+        _canToggle = true;
     }
 }

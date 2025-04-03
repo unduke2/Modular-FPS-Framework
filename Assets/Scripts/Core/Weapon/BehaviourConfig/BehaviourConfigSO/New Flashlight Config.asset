@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a60f25bbe69bfc41aa4315bf96d3c92, type: 3}
   m_Name: New Flashlight Config
   m_EditorClassIdentifier: 
-  FlashlightObject: {fileID: 3275819237893192688, guid: e2e8bb5d8b7e6da4a8b24cc3c2828983, type: 3}
+  _flashlightEnabled: {fileID: 8300000, guid: 232b2c2275597d44191178c9b08a1f40, type: 3}
+  _flashlightDisabled: {fileID: 8300000, guid: 10367946ddbc6164c9ee3a000acd909f, type: 3}

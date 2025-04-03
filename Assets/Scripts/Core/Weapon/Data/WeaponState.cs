@@ -18,6 +18,5 @@ public class WeaponState
 
     public AudioSource MuzzleAudioSource;
     public AudioSource MagazineAudioSource;
-
-
+    public AudioSource FlashlightAudioSource;
 }

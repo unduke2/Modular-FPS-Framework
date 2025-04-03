@@ -14,6 +14,7 @@ public class WeaponFactory : MonoBehaviour
         weapon.State.MuzzleTransform = muzzle;
         weapon.State.MuzzleAudioSource = muzzle.GetComponent<AudioSource>();
         weapon.State.MagazineAudioSource = weaponObject.transform.Find("Magazine").GetComponent<AudioSource>();
+        weapon.State.FlashlightAudioSource = weaponObject.transform.Find("Flashlight").GetComponent<AudioSource>();
 
         foreach (var config in data.BehaviourConfigs)
         {
