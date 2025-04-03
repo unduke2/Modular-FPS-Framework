@@ -14,7 +14,7 @@ A highly modular and scalable first-person shooter framework built in Unity, emp
 
 [![Watch the Demo](https://i.imgur.com/UadfrBZ.jpeg)](https://www.youtube.com/watch?v=zHEBJB2418g)
 
-**[▶ Watch the Demo](https://www.youtube.com/watch?v=zHEBJB2418g)**
+**[▶ Watch Small Demo](https://www.youtube.com/watch?v=zHEBJB2418g)**
 
 ## Tech Stack
 
