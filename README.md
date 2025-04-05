@@ -72,6 +72,5 @@ A highly modular and scalable first-person shooter framework built in Unity, emp
 
 ## Contact
 
-- **Name**: João Yakubets  
 - **Email**: unduke2@tuta.io
 
